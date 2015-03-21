@@ -32,7 +32,7 @@ VINDP2 <- function(
     }
     serieslength <- length(seriesValues)
   }
-  cat(sprintf("serieslength = %f CPUs = %f",serieslength,CPUs))
+  #cat(sprintf("serieslength = %f CPUs = %f",serieslength,CPUs))
   VINDPmatrix = mclapply(1:serieslength,function(serieslengthnow){
     PermutationTimes <- ceiling ( DistributionPop / seriesValues[serieslengthnow] )
     VINDProw = unlist(lapply(1:PermutationTimes,function(PermutationTime){
