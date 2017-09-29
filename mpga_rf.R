@@ -1,23 +1,22 @@
 
 
-mpga_matlab <- function(data = data,
-                        popSize = 300,
-                        MAXGEN = 100,
-                        VIND = c(1,2000),
-                        aslimitNoise = NULL,
-                        initialPop = NULL,
-                        limits = 2,
-                        subpop = 3,
-                        CPUs = 1,
-                        ...){
+mpga_rf  <- function(data = data,
+                     popSize = 300,
+                     MAXGEN = 100,
+                     VIND = c(1,2000),
+                     aslimitNoise = NULL,
+                     initialPop = NULL,
+                     limits = 2,
+                     subpop = 3,
+                     CPUs = 1,
+                     ...){
   VINDopt1 <- VIND[1]
   VINDopt2 <- VIND[2]
   X <- data$x
   Y <- data$y
   vars <- NCOL(X)
   prop <- vars/5 - 1
-  evaluate(matlab,paste("SUBPOP = ",subpop,";"))
-  if (is.null(initialPop))  Chrom <- crtbp(popSize,vars,prop) else Chrom <- initialPop
+  if (is.null(initialPop))  Chrom <- crtbp2(popSize,vars,prop) else Chrom <- initialPop
   
   if (VINDopt1 == 1){
     if (is.null(aslimitNoise)){
