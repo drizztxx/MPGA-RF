@@ -1,11 +1,12 @@
 ## First part, install required libraries
-if( !require( randomForest ) ) install.packages("randomForest")
-if( !require( parallel ) ) install.packages("parallel")
-if( !require( plyr ) ) install.packages("plyr")
-if( !require( devtools ) ) install.packages("devtools")
-devtools::install_github('drizztxx/gatbxr')
-require("gatbxr")
-
+if( !require( randomForest ) ) install.packages("randomForest");require(randomForest)
+if( !require( parallel ) ) install.packages("parallel");require(parallel)
+if( !require( plyr ) ) install.packages("plyr");require(plyr)
+if( !require( gatbxr ) ){
+  if( !require( devtools ) ) install.packages("devtools")
+  devtools::install_github('drizztxx/gatbxr')
+  require(gatbxr)
+}
 ## Second part, initialized mpgarf environment
 if('.mpgarf' %in% search()) detach('.mpgarf')
 if(exists('.mpgarf')) rm(.mpgarf)

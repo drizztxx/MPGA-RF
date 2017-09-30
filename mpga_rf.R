@@ -41,8 +41,6 @@ mpga_rf  <- function(data = data,
   }
   cat("evaluating the ObjV of initial population \n")
   ObjV <- fitfunc_rf(Chrom,500,data,vars,CPUs)$ObjV
-  setVariable(matlab,Chrom = Chrom)
-  setVariable(matlab,ObjV = ObjV)
   
   ObjV.matrix <- matrix(NA,MAXGEN,popSize)
   varimpmatrix <- matrix(NA,MAXGEN,vars)
@@ -50,10 +48,10 @@ mpga_rf  <- function(data = data,
   cat("preparing for the evolution process \n")
   runtime.garf <- system.time(for (gen in 1:MAXGEN){
     
-    evaluate(matlab,"FitnV=ranking(-ObjV,NaN,SUBPOP);","SelCh=select('sus',Chrom,FitnV,1,SUBPOP);",
-             "SelCh=recombin('xovsp',SelCh,0.7,SUBPOP);","SelCh = mutate('mut',SelCh,NaN,NaN,SUBPOP);")
-    data.SelCh <- getVariable(matlab,"SelCh")
-    SelCh <- matrix(unlist(data.SelCh$SelCh),popSize,vars)
+    FitnV <- ranking(-ObjV,2,subpop)
+    SelCh <- select("sus",Chrom,FitnV,1,subpop)
+    SelCh <- recombin("xovsp",SelCh,0.7,subpop)
+    SelCh <- mutate("mut",SelCh,SUBPOP = subpop)
     for (i in 1:popSize){
       while (sum(SelCh[i, ]) == 0) {
         SelCh[i, ] = sample(c(rep(0, prop), 1), vars, rep = TRUE)
@@ -63,27 +61,25 @@ mpga_rf  <- function(data = data,
     if (VINDopt1 == 1) SelCh <- DeNoise(Chrom = SelCh,prop,rfresult = rf.result,limitNoise)
     ObjVSel <- rf.result$ObjV
     varimpmatrix[gen,] <- apply(rf.result$evalImportances,2,median,na.rm = TRUE)
-    setVariable(matlab,ObjV = ObjVSel)
-    setVariable(matlab,Chrom = SelCh)
-#     setVariable(matlab,ObjVSel = ObjVSel)
+    ObjV <- ObjVSel
+    Chrom <- SelCh
 #     evaluate(matlab,"[Chrom ObjV] = reins(Chrom,SelCh,SUBPOP,1,ObjV,ObjVSel);")
     
     
     #???????Ӳ?  *******?д?????********
     #if (gen %% 20 == 0) evaluate(matlab,"[Chrom,ObjV] = migrate(Chrom,SUBPOP,[0.001,1,1],ObjV);")
     
-    data.ObjV <- getVariable(matlab,"ObjV")
-    ObjV.matrix[gen,] <- data.ObjV$ObjV
+    ObjV.matrix[gen,] <- ObjV
     #   data.FitnV <- getVariable(matlab,"FitnV")
     #   FitnV.matrix[gen,] <- data.FitnV$FitnV
-    data.Chrom <- getVariable(matlab,"Chrom")
-    if (gen == MAXGEN) Chrom.last <- data.Chrom$Chrom
+    data.Chrom <- Chrom
+    if (gen == MAXGEN) Chrom.last <- Chrom
     
     cat(paste("GEN = ",gen))
     for (i in 1:subpop){
       sequence <- seq(0,popSize,popSize/subpop)
-      best <- round(max(data.ObjV$ObjV[(sequence[i]+1):sequence[i+1]]),digits = 2)
-      mean <- round(mean(data.ObjV$ObjV[(sequence[i]+1):sequence[i+1]]),digits = 2)
+      best <- round(max(ObjV[(sequence[i]+1):sequence[i+1]]),digits = 2)
+      mean <- round(mean(ObjV[(sequence[i]+1):sequence[i+1]]),digits = 2)
       cat(paste(" subpop",i," best=",best," mean=",mean,"|"))
     }
     cat(paste("\n"))
@@ -135,6 +131,4 @@ mpga_rf  <- function(data = data,
                  Selectedvar = sort.var)
   class(result) <- "mpga"
   return(result)
-  
-  
 }
