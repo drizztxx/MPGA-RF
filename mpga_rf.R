@@ -86,7 +86,8 @@ mpga_rf  <- function(data = data,
     gc()
     mem.used <- memory.size()
     if (mem.used > 800) cat(paste("memory used = ",mem.used," \n"))
-    cat(paste("The remaining time is about ",oncetime[3]*(MAXGEN-gen)/60," minutes. \n"))
+    time.remain <- oncetime[3]*(MAXGEN-gen)/60
+    cat(sprintf("The remaining time is about %1.0f minutes %1.0f seconds \n",time.remain,60*(time.remain %% 1)))
     gen <- gen + 1
   })
   
